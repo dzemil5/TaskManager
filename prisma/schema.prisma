@@ -21,7 +21,7 @@ model Task {
     Priority    Level    @default(LOW)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
-    userId      String
+    userId      Int
     user        User     @relation(fields: [userId], references: [id])
 }
 

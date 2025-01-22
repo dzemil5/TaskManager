@@ -13,7 +13,7 @@ export class TaskService {
     description: string | null,
     dueDate: Date,
     priority: "LOW" | "MEDIUM" | "HIGH",
-    userId: string
+    userId: number
   ): Promise<typeof Task> {
     try {
       if (!title.trim()) {
@@ -53,7 +53,7 @@ export class TaskService {
     }
   }
 
-  async getTasksByUserId(userId: string): Promise<typeof Task[]> {
+  async getUserTasks(userId: number): Promise<typeof Task[]> {
     try {
       const tasks = await Task.findMany({
         where: {
