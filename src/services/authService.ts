@@ -1,17 +1,17 @@
-import { UserService } from '../services/userService';
-import { InputValidatorImpl } from '../utils/inputValidator';
-import { BcryptPasswordHasher } from '../utils/passwordHasher';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { TokenPayload } from '../types/user';
-import dotenv from 'dotenv';
+import { UserService } from "../services/userService";
+import { InputValidatorImpl } from "../utils/inputValidator";
+import { BcryptPasswordHasher } from "../utils/passwordHasher";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { TokenPayload } from "../types/user";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined in the environment variables');
+  throw new Error("JWT_SECRET is not defined in .env");
 }
 
 export class AuthServiceImpl {
@@ -23,42 +23,46 @@ export class AuthServiceImpl {
     this.userService = new UserService(inputValidator, passwordHasher);
   }
 
-  // Login method to authenticate user and return JWT
+  /**Login metoda za autentikaciju korisnika i vracanje JWT tokena */
   async loginUser(email: string, password: string): Promise<string> {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password); // Compare hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new Error('Invalid password');
+      throw new Error("Invalid password");
     }
 
-    const payload: TokenPayload = { id: user.id, email: user.email, name: user.name };
+    const payload: TokenPayload = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
 
-    // Generate JWT token
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+    /**Generisanje JWT tokena */
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 
     return token;
   }
 
-  // Verify the token passed in request to get user details
+  /**Verifikacija tokena prilikom zahteva za vracanje podataka o korisniku */
   async verifyToken(token: string): Promise<TokenPayload> {
     return new Promise((resolve, reject) => {
       jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {
-          console.error('Error verifying token:', err);
-          reject(new Error('Invalid or expired token')); // Reject with error message
+          console.error("Error verifying token:", err);
+          reject(new Error("Invalid or expired token"));
         } else {
-          resolve(decoded as TokenPayload); // Resolve with decoded payload
+          resolve(decoded as TokenPayload);
         }
       });
     });
   }
 
-  // Optionally add method to check if token is expired
+  /**Metoda za proveravanje da li je token istekao */
   async isTokenExpired(token: string): Promise<boolean> {
     try {
       jwt.verify(token, JWT_SECRET);

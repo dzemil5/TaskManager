@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { fetchEmail } from '../services/userService';
+import { fetchEmail } from '../utils/fetchEmail';
 import { TokenPayload } from '../types/user';
-import { JWT_SECRET } from '../config/environment';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 //**Error klasa za nevazece podatke */
 class InvalidCredentialsError extends Error {

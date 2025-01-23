@@ -8,16 +8,16 @@ const prisma = new PrismaClient();
 
 const router: Router = Router();
 
-// Register user
+/**Registruj korisnika */
 router.post('/register', registerUser);
 
-// Login user
+/**Logovanje */
 router.post('/login', loginUser);
 
-// Get user profile
+/**Vrati profil korisnika (prima Bearer token) */
 router.get('/profile', authMiddleware, getUserProfile);
 
-// Get all users
+/**Vrati sve korisnike */
 router.get('/', async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get user by ID
+/**Vrati korisnika po ID */
 router.get('/:id', async (req, res) => {
   const userId = parseInt(req.params.id, 10);
 
@@ -54,7 +54,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update user profile
+//**Azuriraj korisnicki profil */ 
 router.put('/profile', authMiddleware, async (req, res) => {
   if (!req.user) {
     res.status(401).json({ message: 'Unauthorized' });
@@ -74,7 +74,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
   }
 });
 
-// Delete user profile
+/**Izbrisi korisnika */
 router.delete('/profile', authMiddleware, async (req, res) => {
   if (!req.user) {
     res.status(401).json({ message: 'Unauthorized' });
