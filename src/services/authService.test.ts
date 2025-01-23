@@ -32,7 +32,7 @@ describe('AuthServiceImpl', () => {
     const result = await authService.loginUser('test@example.com', 'password');
     expect(result).toBe(token);
     expect(jwt.sign).toHaveBeenCalledWith(
-      { userId: user.id, email: user.email, name: user.name },
+      { id: user.id, email: user.email, name: user.name }, // Corrected field names
       JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -55,5 +55,30 @@ describe('AuthServiceImpl', () => {
     (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
     await expect(authService.loginUser('test@example.com', 'wrongPassword')).rejects.toThrow('Invalid password');
+  });
+
+  it('should verify a valid token and return payload', async () => {
+    const token = 'mockToken';
+    const payload = { id: 1, email: 'test@example.com', name: 'Test User' };
+
+    // Mock jwt.verify to resolve with payload
+    (jwt.verify as jest.Mock).mockImplementation((token, secret, callback) => {
+      callback(null, payload);
+    });
+
+    const result = await authService.verifyToken(token);
+    expect(result).toEqual(payload); // Expect the payload to match
+    expect(jwt.verify).toHaveBeenCalledWith(token, JWT_SECRET, expect.any(Function));
+  });
+
+  it('should throw an error for an invalid or expired token', async () => {
+    const token = 'mockToken';
+
+    // Mock jwt.verify to throw an error
+    (jwt.verify as jest.Mock).mockImplementation((token, secret, callback) => {
+      callback(new Error('Invalid or expired token'), null);
+    });
+
+    await expect(authService.verifyToken(token)).rejects.toThrow('Invalid or expired token');
   });
 });

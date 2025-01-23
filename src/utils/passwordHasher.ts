@@ -5,16 +5,13 @@ export interface PasswordHasher {
     comparePassword(password:string, hashedPassword:string): Promise<boolean>;
 }
 
-
-
 export class BcryptPasswordHasher implements PasswordHasher {
-    async hashPassword(password:string): Promise<string> {
+    async hashPassword(password: string): Promise<string> {
         const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        return hashedPassword;
+        return bcrypt.hash(password, saltRounds);
     }
-    async comparePassword(password:string, hashedPassword:string): Promise<boolean> {
-        return await bcrypt.compare(password,hashedPassword);
+
+    async comparePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+        return bcrypt.compare(plainPassword, hashedPassword);  // Use bcrypt.compare to check passwords
     }
 }
-
