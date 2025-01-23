@@ -43,18 +43,11 @@ export class UserService {
             throw error;
         }
     }
-
-    async getUserByEmail(email: string) {
-        try {
-            const user = await prisma.user.findUnique({
-                where: {
-                    email,
-                },
-            });
-            return user;
-        } catch (error) {
-            console.error("Error finding user by email:", error); 
-            throw error;
-        }
-    }
 }
+
+export const getUserByEmail = async (email: string) => {
+    return prisma.user.findUnique({
+      where: { email },
+    });
+  };
+  
