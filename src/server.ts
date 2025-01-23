@@ -9,7 +9,7 @@ const app: Application = express();
 
 app.use(express.json());
 
-app.use("/api/users", userRoutes); 
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is running");
@@ -18,7 +18,6 @@ app.get("/", (req, res) => {
 app.get("/api/test", (req, res) => {
   res.send("Test route works!");
 });
-
 
 app.use(errorMiddleware);
 

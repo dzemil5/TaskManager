@@ -14,13 +14,13 @@ export class UserService {
     this.passwordHasher = passwordHasher;
   }
 
-  // Function to hash the password using bcrypt
+  /**Hesiranje sifre pomocu bcrypt */
   async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
     return bcrypt.hash(password, saltRounds);
   }
 
-  // Function to create a new user
+  /**Funkcija za kreiranje novog korisnika */
   async createUser(email: string, password: string, name?: string) {
     try {
       if (!email) {
@@ -33,13 +33,13 @@ export class UserService {
         throw new Error("Invalid email");
       }
 
-      // Validate the raw password format before hashing
+      /**Validacija formata sifre pre hashinga */
       if (!this.inputValidator.validatePassword(password)) {
         console.log("Password provided: ", password);
         throw new Error("Invalid password");
       }
 
-      // Hash the password
+      /**Hashing */
       const hashedPassword = await this.hashPassword(password);
 
       const user = await prisma.user.create({
@@ -57,7 +57,7 @@ export class UserService {
     }
   }
 
-  // Function to get a user by email
+  /**Vracanje korisnika po emailu */
   async getUserByEmail(email: string) {
     try {
       const user = await prisma.user.findUnique({
@@ -72,7 +72,7 @@ export class UserService {
     }
   }
 
-  // Login logic (checking if the provided password matches the hashed password)
+  /**Logika za login(proverava da li sifra odgovara hasiranoj sifri) */
   async loginUser(email: string, password: string) {
     try {
       const user = await this.getUserByEmail(email);
@@ -80,13 +80,13 @@ export class UserService {
         throw new Error("User not found");
       }
 
-      // Compare password with hashed password from the DB
+      /**Poredi sifru sa hasiranom sifrom iz baze */
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         throw new Error("Invalid password");
       }
 
-      // User authenticated successfully
+      /**Uspesna autentikacija */
       return user;
     } catch (error) {
       console.error("Error logging in:", error);
@@ -94,10 +94,3 @@ export class UserService {
     }
   }
 }
-
-// Utility function to fetch user by email (if needed outside the UserService)
-export const fetchEmail = async (email: string) => {
-  return prisma.user.findUnique({
-    where: { email },
-  });
-};
