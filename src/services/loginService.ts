@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getUserByEmail } from './userService';
+import { fetchEmail } from '../services/userService';
 import { TokenPayload } from '../types/user';
 import { JWT_SECRET } from '../config/environment';
+
+
 
 //**Error klasa za nevazece podatke */
 class InvalidCredentialsError extends Error {
@@ -25,14 +27,14 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
   }
 
   //**Uzmi podatke o korisniku */
-  const user = await getUserByEmail(email);
+  const user = await fetchEmail(email);
   if (!user) {
     throw new InvalidCredentialsError();
   }
 
   //**Proveri da li je ime korisnika prazno */
   if (!user.name || user.name.trim() === '') {
-    throw new InvalidCredentialsError();  // Or throw a more specific error message like 'Name is required'
+    throw new InvalidCredentialsError(); 
   }
 
   //**Poredi sifru sa hesiranom sifrom */

@@ -12,7 +12,7 @@ export class UserService {
         this.inputValidator = inputValidator;
         this.passwordHasher = passwordHasher;
     }
-
+      
     async createUser(email: string, password: string, name?: string) {
         try {
             if (!email) {
@@ -43,9 +43,23 @@ export class UserService {
             throw error;
         }
     }
+
+    async getUserByEmail(email: string) {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    email,
+                },
+            });
+            return user;
+        } catch (error) {
+            console.error("Error finding user by email:", error); 
+            throw error;
+        }
+    }
 }
 
-export const getUserByEmail = async (email: string) => {
+export const fetchEmail = async (email: string) => {
     return prisma.user.findUnique({
       where: { email },
     });

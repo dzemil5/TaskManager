@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { loginUser } from './loginService';
-import { getUserByEmail } from './userService';
+import { fetchEmail } from './userService';
 
 // Mocking dependencies
 jest.mock('./userService');
@@ -37,7 +37,7 @@ describe('loginUser', () => {
     bcrypt.compare = jest.fn().mockResolvedValue(true);
 
     // Mock getUserByEmail to return a user with name or without name
-    (getUserByEmail as jest.Mock).mockResolvedValue(mockUser);
+    (fetchEmail as jest.Mock).mockResolvedValue(mockUser);
 
     // Mock JWT methods to return a proper token with payload and exp
     jwt.sign = jest.fn().mockImplementation((payload, secret, options) => {
@@ -63,7 +63,7 @@ describe('loginUser', () => {
   });
 
   it('should throw an error if user name is missing (null)', async () => {
-    (getUserByEmail as jest.Mock).mockResolvedValue(mockUserWithoutName);
+    (fetchEmail as jest.Mock).mockResolvedValue(mockUserWithoutName);
     await expect(loginUser('test@example.com', 'password')).rejects.toThrow('Invalid email or password');  // Assuming missing name results in invalid login
   });
 
@@ -74,12 +74,12 @@ describe('loginUser', () => {
       password: '$2b$10$hashedpassword', 
       name: ''  // Simulate empty name
     };
-    (getUserByEmail as jest.Mock).mockResolvedValue(mockUserWithInvalidName);
+    (fetchEmail as jest.Mock).mockResolvedValue(mockUserWithInvalidName);
     await expect(loginUser('test@example.com', 'password')).rejects.toThrow('Invalid email or password');  // Assuming empty name results in invalid login
   });
 
   it('should throw an error for invalid email', async () => {
-    (getUserByEmail as jest.Mock).mockResolvedValue(null);
+    (fetchEmail as jest.Mock).mockResolvedValue(null);
     await expect(loginUser('invalid@example.com', 'password')).rejects.toThrow('Invalid email or password');
   });
 
@@ -116,7 +116,7 @@ describe('loginUser', () => {
   });
 
   it('should throw an error when user is not found', async () => {
-    (getUserByEmail as jest.Mock).mockResolvedValue(null);
+    (fetchEmail as jest.Mock).mockResolvedValue(null);
     await expect(loginUser('nonexistent@example.com', 'password')).rejects.toThrow('Invalid email or password');
   });
 
