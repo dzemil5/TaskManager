@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { PrismaClient } from '@prisma/client';
 import { InputValidator } from "../utils/inputValidator";
 import { PasswordHasher } from "../utils/passwordHasher";
@@ -59,12 +58,3 @@ export class UserService {
         }
     }
 }
-=======
-import prisma from "../models/userModel";
-
-export const getUserByEmail = async (email: string) => {
-  return prisma.user.findUnique({
-    where: { email },
-  });
-};
->>>>>>> 387d7be281401d727cedec8ad1e7b0698b4c4faf
