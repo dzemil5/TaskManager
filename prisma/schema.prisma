@@ -1,10 +1,19 @@
 datasource db {
+<<<<<<< HEAD
   provider = "postgresql"
   url      = env("DB_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+=======
+    provider = "postgresql"
+    url      = env("DB_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+>>>>>>> 387d7be281401d727cedec8ad1e7b0698b4c4faf
 }
 
 model User {
@@ -12,5 +21,8 @@ model User {
     email    String  @unique
     password String
     name     String?
+<<<<<<< HEAD
     createdAt DateTime @default(now())
+=======
+>>>>>>> 387d7be281401d727cedec8ad1e7b0698b4c4faf
 }
