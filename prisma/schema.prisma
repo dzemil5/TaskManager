@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+    url      = env("DB_URL")
 }
 
 model User {
@@ -12,5 +13,4 @@ model User {
     email    String  @unique
     password String
     name     String?
-    createdAt DateTime @default(now())
 }
