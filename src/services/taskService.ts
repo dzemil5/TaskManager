@@ -81,7 +81,7 @@ export class TaskService {
       title: string;
       description: string | null;
       dueDate: Date | string;
-      Priority: Level;
+      priority: Level;
     }>
   ): Promise<TaskType | null> {
     try {
@@ -91,6 +91,10 @@ export class TaskService {
         where: { id },
         data: updates,
       });
+
+      if(!updates.title || !updates.description || !updates.dueDate || !updates.priority) {
+        throw new Error("Missing required fields");
+      }
 
       return task;
     } catch (error) {
@@ -147,17 +151,29 @@ export class TaskService {
     });
   }
   
-  async updateTaskCompletion(taskId: number, isCompleted: boolean) {
-    return await prisma.task.update({
-      where: {
-        id: taskId,
-      },
+ async updateTaskCompletion(taskId: number) {
+  try {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+    });
+
+    if (!task) {
+      throw new Error(`Task with id ${taskId} not found`);
+    }
+    
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId },
       data: {
-        isCompleted: !isCompleted,
+        isCompleted: !task.isCompleted,
       },
     });
+
+    return updatedTask;
+  } catch (error) {
+    console.error("Error toggling task completion:", error);
+    throw error;
   }
-  
+}
   async getTaskCounts(userId: number) {
     const [totalTasks, completedTasks, incompleteTasks] = await Promise.all([
       prisma.task.count({

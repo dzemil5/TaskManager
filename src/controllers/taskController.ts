@@ -94,9 +94,9 @@ export class TaskController {
     res.json(tasks);
   }
   
-  async updateTaskCompletion(id: number, isCompleted: boolean, res: Response) {
+  async toggleTaskCompletion(id: number, res: Response) {
     try {
-      const task = await taskService.updateTaskCompletion(id, isCompleted);
+      const task = await taskService.updateTaskCompletion(id);
       res.json(task);
     } catch (error) {
       console.error(error);
