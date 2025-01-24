@@ -1,9 +1,7 @@
 export interface InputValidator {
-    validateEmail(email:string): boolean;
-    validatePassword(password:string):boolean;
-    validateDate(date: Date): boolean;
-  validateEmail(email: string): boolean;
-  validatePassword(password: string): boolean;
+  validateEmail(email:string): boolean;
+  validatePassword(password:string):boolean;
+  validateDate(date: Date): boolean;
 }
 
 /**Implementacija interfejsa InputValidator */

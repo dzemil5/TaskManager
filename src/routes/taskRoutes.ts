@@ -30,10 +30,10 @@ router.put('/tasks/:id', taskController.updateTask);
 router.delete('/tasks/:id', taskController.deleteTask);
 
 router.put('/tasks/:id/completion', (req: Request, res: Response) => {
-    const id = parseInt(req.params.id, 10);
-    const isCompleted = req.body.isCompleted;
-    taskController.updateTaskCompletion(id, isCompleted, res);
-  });
+  const id = parseInt(req.params.id, 10);
+  taskController.toggleTaskCompletion(id, res);
+});
+
 
 router.use(errorMiddleware);
 
