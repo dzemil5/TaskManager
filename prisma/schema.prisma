@@ -1,32 +1,35 @@
-model User {
-    id       Int     @id @default(autoincrement())
-    email    String  @unique
-    password String
-    name     String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    role Role @default(USER)
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
 }
 
-enum Role {
-    ADMIN
-    USER
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  password String
+  name     String?
+  Task     Task[]
 }
 
 model Task {
-    id          Int      @id @default(autoincrement())
-    title       String
-    description String?
-    dueDate     DateTime
-    Priority    Level    @default(LOW)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    userId      Int
-    user        User     @relation(fields: [userId], references: [id])
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  dueDate     DateTime
+  Priority    Level    @default(LOW)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isCompleted Boolean  @default(false)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 enum Level {
-    LOW
-    MEDIUM
-    HIGH
+  LOW
+  MEDIUM
+  HIGH
 }
