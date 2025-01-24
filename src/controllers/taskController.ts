@@ -58,4 +58,53 @@ export class TaskController {
     await taskService.deleteTask(id);
     res.json({ message: 'Task deleted successfully' });
   }
+
+  async getTasksByPriority(req: Request, res: Response) {
+    if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+    const userId = req.user.id;
+    const tasks = await taskService.getTasksByPriority(userId);
+    res.json(tasks);
+  }
+  
+  async getTasksByAlphabeticalOrder(req: Request, res: Response) {
+    if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+    const userId = req.user.id;
+    const asc = req.query.asc === 'true';
+    const tasks = await taskService.getTasksByAlphabeticalOrder(userId, asc);
+    res.json(tasks);
+  }
+  
+  async getTasksByCompletion(req: Request, res: Response) {
+    if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+    const userId = req.user.id;
+    const isCompleted = req.query.isCompleted === 'true';
+    const tasks = await taskService.getTasksByCompletion(userId);
+    res.json(tasks);
+  }
+  
+  async updateTaskCompletion(req: Request, res: Response) {
+    const taskId = parseInt(req.params.id, 10);
+    const isCompleted = req.body.isCompleted;
+    const task = await taskService.updateTaskCompletion(taskId, isCompleted);
+    res.json(task);
+  }
+  
+  async getTaskCounts(req: Request, res: Response) {
+    if (!req.user) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+    }
+    const userId = req.user.id;
+    const counts = await taskService.getTaskCounts(userId);
+    res.json(counts);
+  }
 }

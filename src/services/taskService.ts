@@ -1,5 +1,8 @@
 import { Task } from "../models/taskModel";
 import { InputValidator } from "../utils/inputValidator";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export class TaskService {
   private inputValidator: InputValidator;
@@ -103,5 +106,79 @@ export class TaskService {
       console.error("Error deleting task:", error);
       throw error;
     }
+  }
+
+  async getTasksByPriority(userId: number) {
+    return await prisma.task.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        priority: {
+          in: ['LOW', 'MEDIUM', 'HIGH'],
+        },
+      },
+    });
+  }
+  
+  async getTasksByAlphabeticalOrder(userId: number, asc: boolean = true) {
+    return await prisma.task.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        title: asc ? 'asc' : 'desc',
+      },
+    });
+  }
+  
+  async getTasksByCompletion(userId: number) {
+    return await prisma.task.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        isCompleted: 'asc',
+      },
+    });
+  }
+  
+  async updateTaskCompletion(taskId: number, isCompleted: boolean) {
+    return await prisma.task.update({
+      where: {
+        id: taskId,
+      },
+      data: {
+        isCompleted,
+      },
+    });
+  }
+  
+  async getTaskCounts(userId: number) {
+    const [totalTasks, completedTasks, incompleteTasks] = await Promise.all([
+      prisma.task.count({
+        where: {
+          userId,
+        },
+      }),
+      prisma.task.count({
+        where: {
+          userId,
+          isCompleted: true,
+        },
+      }),
+      prisma.task.count({
+        where: {
+          userId,
+          isCompleted: false,
+        },
+      }),
+    ]);
+  
+    return {
+      totalTasks,
+      completedTasks,
+      incompleteTasks,
+    };
   }
 }
