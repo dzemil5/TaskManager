@@ -1,8 +1,8 @@
-import { Task } from "../models/taskModel";
+import { PrismaClient, Task as TaskType,Level } from "@prisma/client";
 import { InputValidator } from "../utils/inputValidator";
-import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+export const Task = prisma.task;
 
 export class TaskService {
   private inputValidator: InputValidator;
@@ -14,25 +14,29 @@ export class TaskService {
   async createTask(
     title: string,
     description: string | null,
-    dueDate: Date,
-    priority: "LOW" | "MEDIUM" | "HIGH",
+    dueDate: Date | string,
+    priority: Level,
     userId: number
-  ): Promise<typeof Task> {
+  ): Promise<TaskType> {
     try {
       if (!title.trim()) {
         throw new Error("Title cannot be empty or whitespace only");
       }
 
-      if (!this.inputValidator.validateDate(dueDate)) {
+      const parsedDueDate = typeof dueDate === 'string' ? new Date(dueDate) : dueDate;
+
+      if (!this.inputValidator.validateDate(parsedDueDate)) {
         throw new Error("Invalid due date: must be a valid date and not in the past");
       }
 
       const task = await Task.create({
-        title,
-        description,
-        dueDate,
-        Priority: priority,
-        userId,
+        data: {
+          title,
+          description,
+          dueDate: parsedDueDate,
+          priority,
+          userId,
+        },
       });
 
       return task;
@@ -41,7 +45,7 @@ export class TaskService {
       throw error;
     }
   }
-  async getTaskById(id: number): Promise<typeof Task | null> {
+  async getTaskById(id: number): Promise<TaskType | null> {
     try {
       const task = await Task.findUnique({
         where: {
@@ -56,15 +60,15 @@ export class TaskService {
     }
   }
 
-  async getUserTasks(userId: number): Promise<typeof Task[]> {
+  async getUserTasks(userId: number): Promise<TaskType[]> {
     try {
-      const tasks = await Task.findMany({
+      const task = await Task.findMany({
         where: {
           userId,
         },
       });
 
-      return tasks;
+      return task;
     } catch (error) {
       console.error("Error retrieving tasks by user ID:", error);
       throw error;
@@ -76,11 +80,13 @@ export class TaskService {
     updates: Partial<{
       title: string;
       description: string | null;
-      dueDate: Date;
-      Priority: "LOW" | "MEDIUM" | "HIGH";
+      dueDate: Date | string;
+      Priority: Level;
     }>
-  ): Promise<typeof Task | null> {
+  ): Promise<TaskType | null> {
     try {
+      const parsedDueDate = typeof updates.dueDate === 'string' ? new Date(updates.dueDate) : updates.dueDate;
+      updates.dueDate = parsedDueDate;
       const task = await Task.update({
         where: { id },
         data: updates,
@@ -93,7 +99,7 @@ export class TaskService {
     }
   }
 
-  async deleteTask(id: number): Promise<typeof Task | null> {
+  async deleteTask(id: number): Promise<TaskType | null> {
     try {
       const task = await Task.delete({
         where: {
@@ -114,9 +120,7 @@ export class TaskService {
         userId,
       },
       orderBy: {
-        priority: {
-          in: ['LOW', 'MEDIUM', 'HIGH'],
-        },
+        priority: 'asc',
       },
     });
   }
@@ -149,7 +153,7 @@ export class TaskService {
         id: taskId,
       },
       data: {
-        isCompleted,
+        isCompleted: !isCompleted,
       },
     });
   }

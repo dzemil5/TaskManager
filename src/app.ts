@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 /**Routes */
-app.use("/api/tasks", taskRoutes);
+app.use("/api", taskRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/users/profile", authMiddleware, getUserProfile);
 

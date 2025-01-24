@@ -28,13 +28,16 @@ export class TaskController {
         res.status(401).json({ message: "Unauthorized" });
         return;
     }
-
-    const task = await taskService.createTask(title, description, dueDate, priority, req.user.id);
+    try{
+      const task = await taskService.createTask(title, description, dueDate, priority, req.user.id);
     res.json(task);
+    } catch (error) {
+      res.status(500).json({ message: 'Error creating task', error });
+    }
+    
   }
 
-  async getTaskById(req: Request, res: Response) {
-    const id = parseInt(req.params.id, 10);
+  async getTaskById(id: number, res: Response) {
     const task = await taskService.getTaskById(id);
     if (!task) {
       res.status(404).json({ message: 'Task not found' });
@@ -55,6 +58,7 @@ export class TaskController {
 
   async deleteTask(req: Request, res: Response) {
     const id = parseInt(req.params.id, 10);
+
     await taskService.deleteTask(id);
     res.json({ message: 'Task deleted successfully' });
   }
@@ -86,16 +90,18 @@ export class TaskController {
         return;
     }
     const userId = req.user.id;
-    const isCompleted = req.query.isCompleted === 'true';
     const tasks = await taskService.getTasksByCompletion(userId);
     res.json(tasks);
   }
   
-  async updateTaskCompletion(req: Request, res: Response) {
-    const taskId = parseInt(req.params.id, 10);
-    const isCompleted = req.body.isCompleted;
-    const task = await taskService.updateTaskCompletion(taskId, isCompleted);
-    res.json(task);
+  async updateTaskCompletion(id: number, isCompleted: boolean, res: Response) {
+    try {
+      const task = await taskService.updateTaskCompletion(id, isCompleted);
+      res.json(task);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
   
   async getTaskCounts(req: Request, res: Response) {

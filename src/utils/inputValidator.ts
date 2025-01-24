@@ -18,8 +18,9 @@ export class InputValidatorImpl implements InputValidator {
     return passwordRegex.test(password);
   }
 
-  validateDate(date: Date): boolean {
+  validateDate(date: any): boolean {
     const now = new Date();
-    return date instanceof Date && !isNaN(date.getTime()) && date >= now;
+    const parsedDate = new Date(date); 
+    return parsedDate instanceof Date && !isNaN(parsedDate.getTime()) && parsedDate >= now;
   }
 }
