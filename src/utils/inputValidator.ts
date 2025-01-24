@@ -1,4 +1,7 @@
 export interface InputValidator {
+    validateEmail(email:string): boolean;
+    validatePassword(password:string):boolean;
+    validateDate(date: Date): boolean;
   validateEmail(email: string): boolean;
   validatePassword(password: string): boolean;
 }
@@ -15,5 +18,11 @@ export class InputValidatorImpl implements InputValidator {
   validatePassword(password: string): boolean {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
     return passwordRegex.test(password);
+  }
+
+  validateDate(date: any): boolean {
+    const now = new Date();
+    const parsedDate = new Date(date); 
+    return parsedDate instanceof Date && !isNaN(parsedDate.getTime()) && parsedDate >= now;
   }
 }
