@@ -1,3 +1,3 @@
 # Task Manager
 
-Full stack aplikacija za menadzment zadataka sa implementiranom registracijom i loginom
+Back-end built using TypeScript and Node.js with Prisma. 
